@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  admin:
+    user: 1000:1000
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    command: 'php artisan serve --host=0.0.0.0'
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+    depends_on:
+      - admin_db
+
+  admin_queue:
+    user: 1000:1000
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    command: 'php artisan queue:work'
+    depends_on:
+      - admin_db
+
+  admin_db:
+    image: mysql:5.7.22
+    environment:
+      MYSQL_DATABASE: admin
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - admin-dbdata:/var/lib/mysql
+    ports:
+      - 33060:3306
+volumes:
+  admin-dbdata:
